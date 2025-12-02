@@ -1,18 +1,20 @@
 import os
 from typing import List, Dict
-import openai
 
 API_KEY = os.getenv("OPENAI_API_KEY")
-openai.api_key = API_KEY
+from openai import OpenAI
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
 
 def call_llm(prompt: str, model="gpt-4o-mini", max_tokens=300):
-    resp = openai.ChatCompletion.create(
+    response = client.chat.completions.create(
         model=model,
-        messages=[{"role":"user","content":prompt}],
-        temperature=0.2,
-        max_tokens=max_tokens
+        messages=[{"role": "user", "content": prompt}],
+        max_tokens=max_tokens,
+        temperature=0.2
     )
-    return resp["choices"][0]["message"]["content"]
+    return response.choices[0].message.content
+
 
 def generate_questions(role: str, skill: str, n=5) -> List[str]:
     prompt = f"""You are an interview question generator.
