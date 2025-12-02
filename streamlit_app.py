@@ -3,67 +3,61 @@ import streamlit as st
 import os
 from utils import generate_questions, evaluate_answer
 
-# Load API key correctly
+st.set_page_config(page_title="AI Interview Bot", layout="wide")
+
+# Load API key from Streamlit Secrets
 if "OPENAI_API_KEY" in st.secrets:
     os.environ["OPENAI_API_KEY"] = st.secrets["OPENAI_API_KEY"]
 else:
-    st.error("API key missing in secrets.toml")
+    st.error("⚠️ Missing OPENAI_API_KEY in Streamlit Secrets!")
+    st.stop()
 
-from utils import generate_questions, evaluate_answer
+st.title("🤖 AI Interview Bot")
+st.write("Generate mock interview questions & evaluate your answers.")
 
-st.set_page_config(page_title="AI Interview Bot", layout="centered")
+# --- Sidebar for inputs ---
+st.sidebar.header("Interview Settings")
 
-st.title("AI Interview Bot — Demo")
+role = st.sidebar.text_input("Job Role", "Software Engineer")
+skill = st.sidebar.text_input("Primary Skill", "Python")
+n_questions = st.sidebar.slider("Number of Questions", 1, 10, 5)
 
-# Optional: load secret into env (if using Streamlit Cloud)
-if "OPENAI_API_KEY" in st.secrets:
-    os.environ["OPENAI_API_KEY"] = st.secrets["OPENAI_API_KEY"]
+if st.sidebar.button("Generate Questions"):
+    st.session_state.questions = generate_questions(role, skill, n_questions)
+    st.session_state.current_q = 0
+    st.session_state.answers = []
+    st.success("Questions generated!")
 
-role = st.text_input("Role", "Backend Engineer")
-skill = st.text_input("Skill", "APIs")
-n_questions = st.number_input("Number of questions", min_value=1, max_value=10, value=5)
-
-if st.button("Generate Questions"):
-    with st.spinner("Generating questions..."):
-        qs = generate_questions(role, skill, n=int(n_questions))
-    # qs is expected to be a list; handle fallback
-    if isinstance(qs, list):
-        st.session_state["questions"] = qs
-        st.success(f"Generated {len(qs)} items")
-        # show debug raw content if parser might have failed (single long item)
-        if len(qs) == 1 and len(qs[0].splitlines()) > 3:
-            st.info("LLM returned a single block — displaying raw text. If this looks odd, try changing the model or prompt.")
-            st.text(qs[0])
-    else:
-        # just in case something not list is returned
-        st.session_state["questions"] = [str(qs)]
-        st.warning("Unexpected response format from generate_questions; showing raw response.")
-
+# --- Main Flow ---
 if "questions" in st.session_state:
-    st.header("Questions")
-    for i, q in enumerate(st.session_state["questions"], start=1):
-        st.subheader(f"Q{i}")
-        st.write(q)
-        ans_key = f"answer_{i}"
-        st.text_area(f"Your answer to Q{i}", key=ans_key, height=120)
-        if st.button(f"Evaluate Q{i}", key=f"eval_{i}"):
-            answer = st.session_state.get(ans_key, "").strip()
-            if not answer:
-                st.warning("Please type/paste an answer before evaluation.")
-            else:
-                with st.spinner("Evaluating..."):
-                    eval_text = evaluate_answer(q, answer)
-                st.markdown("**Evaluation result:**")
-                st.text(eval_text)
-                # save transcript
-                import json, time
-                os.makedirs("sample_transcripts", exist_ok=True)
-                fname = f"sample_transcripts/{role.replace(' ','_')}_{skill}_{int(time.time())}_q{i}.json"
-                with open(fname, "w") as f:
-                    json.dump({"q": q, "a": answer, "eval": eval_text}, f, indent=2)
-                st.success(f"Saved transcript to {fname}")
 
-# show small footer and debug
-st.write("---")
-if st.button("Show debug env"):
-    st.write("OPENAI_API_KEY present in env:", bool(os.environ.get("OPENAI_API_KEY")))
+    questions = st.session_state.questions
+    current = st.session_state.current_q
+
+    if current < len(questions):
+        st.subheader(f"Q{current+1}: {questions[current]}")
+
+        answer = st.text_area("Your Answer")
+
+        if st.button("Submit Answer"):
+            if answer.strip() == "":
+                st.warning("Please write an answer.")
+            else:
+                evaluation = evaluate_answer(questions[current], answer)
+                st.session_state.answers.append(
+                    {"question": questions[current], "answer": answer, "evaluation": evaluation}
+                )
+                st.session_state.current_q += 1
+                st.rerun()
+    else:
+        st.header("🎉 Interview Completed")
+        st.write("Here are your results:")
+
+        for i, item in enumerate(st.session_state.answers, 1):
+            st.subheader(f"Q{i}: {item['question']}")
+            st.write("**Your Answer:**")
+            st.write(item["answer"])
+            st.write("**Evaluation:**")
+            st.write(item["evaluation"])
+            st.markdown("---")
+
