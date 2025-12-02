@@ -6,7 +6,7 @@ import json
 
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-def call_llm(prompt: str, model="gpt-4o-mini", max_tokens=300):
+def call_llm(prompt, model="gpt-4o-mini", max_tokens=300):
     response = client.chat.completions.create(
         model=model,
         messages=[{"role":"user", "content": prompt}],
