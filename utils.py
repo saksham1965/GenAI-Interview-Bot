@@ -1,9 +1,16 @@
 # utils.py
-# utils.py
 import os
+from openai import OpenAI
+
+api_key = os.environ.get("OPENAI_API_KEY")
+
+if not api_key:
+    raise ValueError("OPENAI_API_KEY not found! Please set it in .streamlit/secrets.toml")
+
+client = OpenAI(api_key=api_key)
+
 import re
 from typing import List
-from openai import OpenAI
 
 # initialize client (ensure OPENAI_API_KEY in env)
 client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
