@@ -3,6 +3,14 @@ import streamlit as st
 import os
 from utils import generate_questions, evaluate_answer
 
+# Load API key correctly
+if "OPENAI_API_KEY" in st.secrets:
+    os.environ["OPENAI_API_KEY"] = st.secrets["OPENAI_API_KEY"]
+else:
+    st.error("API key missing in secrets.toml")
+
+from utils import generate_questions, evaluate_answer
+
 st.set_page_config(page_title="AI Interview Bot", layout="centered")
 
 st.title("AI Interview Bot — Demo")
