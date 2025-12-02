@@ -1,4 +1,4 @@
-# GenAI Interview Bot
+# GenAI Interview Bot 🤖
 https://genai-interview-bot-6gyeadyseqvxzga6ymfmbz.streamlit.app/
 
 A minimal AI-powered interview bot that:
