@@ -102,7 +102,7 @@ You are an interviewer evaluator. Given a question and an answer, provide:
 - A one-line improvement suggestion
 
 Return as plain text (not JSON).
-Question: {question}
-Answer: {answer}
+Question 1:How do you approach designing a RESTful API?
+Answer:You would design it using standard conventions like clear, resource-based URLs, appropriate HTTP methods (GET, POST, PUT, DELETE), and standard response codes. You would also consider aspects like versioning, request/response formats (like JSON), and authentication/authorization. 
 """
     return call_llm(prompt, max_tokens=400)
