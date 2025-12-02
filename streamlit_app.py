@@ -1,5 +1,10 @@
 import streamlit as st
-import json, os
+import os
+import json 
+
+# Load secret into environment
+os.environ["OPENAI_API_KEY"] = st.secrets["OPENAI_API_KEY"]
+
 from utils import generate_questions, evaluate_answer
 
 st.title("AI Interview Bot — Demo")
