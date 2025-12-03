@@ -1,5 +1,6 @@
 #  Interview Bot 🤖
 https://genai-interview-bot-6gyeadyseqvxzga6ymfmbz.streamlit.app/
+Video link -
 
 A minimal AI-powered interview bot that:
 - Generates interview questions by role & skill
