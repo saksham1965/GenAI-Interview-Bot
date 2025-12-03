@@ -1,4 +1,4 @@
-#  Interview Bot 🤖
+#  Interview Bot 
 https://genai-interview-bot-6gyeadyseqvxzga6ymfmbz.streamlit.app/
 
 Video link :- https://drive.google.com/file/d/1asBsLCnQ7iHszyAzVgbPx8TSpZ9s4GMg/view?usp=sharing
